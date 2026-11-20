@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบสุ่มเวรทิ้งขยะ</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font Prompt -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100 min-h-screen text-slate-800 antialiased py-8 px-4 sm:px-6">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <div class="inline-flex items-center justify-center p-3 bg-emerald-600 text-white rounded-2xl shadow-lg mb-4">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">ระบบสุ่มเวรทิ้งขยะ</h1>
+            <p class="text-slate-600 mt-2 text-sm sm:text-base">แก้ปัญหาวันหยุดไม่ตรงกัน จัดเวรง่าย สะดวก รวดเร็ว ยุติธรรม</p>
+        </header>
+
+        <!-- Main Card -->
+        <div class="bg-white/80 backdrop-blur-md shadow-xl rounded-3xl p-6 sm:p-8 border border-white/40 mb-8">
+
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg sm:text-xl font-semibold text-slate-800 flex items-center gap-2">
+                        <span class="flex items-center justify-center w-7 h-7 bg-emerald-100 text-emerald-700 rounded-full text-sm font-bold">1</span>
+                        กำหนดวันที่ต้องทิ้งขยะ (เช่น วันที่ 1 - 5)
+                    </h2>
+                    <button onclick="addDateRow()" class="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-xl shadow-sm transition-all duration-200 active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        เพิ่มวันที่
+                    </button>
+                </div>
+                <div id="dates-container" class="space-y-3">
+                    <!-- Dynamic Date Rows will be injected here -->
+                </div>
+            </div>
+
+            <hr class="border-slate-100 my-8">
+
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg sm:text-xl font-semibold text-slate-800 flex items-center gap-2">
+                        <span class="flex items-center justify-center w-7 h-7 bg-emerald-100 text-emerald-700 rounded-full text-sm font-bold">2</span>
+                        รายชื่อสมาชิกและวันว่าง
+                    </h2>
+                    <button onclick="addMemberRow()" class="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-xl shadow-sm transition-all duration-200 active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        เพิ่มสมาชิก
+                    </button>
+                </div>
+                <div id="members-container" class="space-y-4">
+                    <!-- Dynamic Member Cards will be injected here -->
+                </div>
+                <p class="text-xs text-slate-500 mt-3">💾 รายชื่อและวันที่จะถูกบันทึกในเบราว์เซอร์เครื่องนี้อัตโนมัติ
+                    <button onclick="resetData()" class="underline text-rose-500 hover:text-rose-600 ml-1">รีเซ็ตเป็นค่าเริ่มต้น</button>
+                </p>
+            </div>
+
+            <div class="pt-4 text-center">
+                <button onclick="randomizeDuty()" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-lg rounded-2xl shadow-lg shadow-emerald-600/25 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 mx-auto">
+                    🎲 สุ่มเวรทิ้งขยะทันที
+                </button>
+            </div>
+        </div>
+
+        <div id="result-section" class="hidden bg-white/90 backdrop-blur-md shadow-xl rounded-3xl p-6 sm:p-8 border border-emerald-100 mb-12">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <span class="text-2xl">🎉</span> ผลการสุ่มตารางเวรทิ้งขยะ
+                </h3>
+                <button onclick="copyResults()" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                    คัดลอกผลลัพธ์
+                </button>
+            </div>
+            <div class="overflow-x-auto rounded-2xl border border-slate-200">
+                <table class="w-full text-left border-collapse bg-white text-sm sm:text-base">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                            <th class="py-3 px-4">วันที่ / ช่วงเวลา</th>
+                            <th class="py-3 px-4">ผู้รับผิดชอบเวร</th>
+                        </tr>
+                    </thead>
+                    <tbody id="result-tbody" class="divide-y divide-slate-100">
+                        <!-- Result rows injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Toast -->
+        <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
+            <span id="toast-icon">✅</span>
+            <span id="toast-message" class="text-sm font-medium">ข้อความแจ้งเตือน</span>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'trashDutyRandomizer_v1';
+
+        // Default data
+        function getDefaults() {
+            return {
+                dutyDates: ["วันที่ 1 - 2", "วันที่ 3 - 4", "วันที่ 5"],
+                members: [
+                    { id: 1, name: "MAX", available: ["วันที่ 1 - 2", "วันที่ 3 - 4", "วันที่ 5"] },
+                    { id: 2, name: "ThinkAboutST", available: ["วันที่ 1 - 2", "วันที่ 3 - 4", "วันที่ 5"] },
+                    { id: 3, name: "Ttt", available: ["วันที่ 1 - 2", "วันที่ 3 - 4", "วันที่ 5"] },
+                    { id: 4, name: "Ohm Greentea", available: ["วันที่ 1 - 2", "วันที่ 3 - 4", "วันที่ 5"] },
+                    { id: 5, name: "เนมนะคับ🫡", available: ["วันที่ 1 - 2", "วันที่ 3 - 4", "วันที่ 5"] },
+                    { id: 6, name: "JM", available: ["วันที่ 1 - 2", "วันที่ 3 - 4", "วันที่ 5"] }
+                ]
+            };
+        }
+
+        let dutyDates = getDefaults().dutyDates;
+        let members = getDefaults().members;
+
+        // ---- Persistence (localStorage) ----
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({ dutyDates, members }));
+            } catch (e) {
+                // Storage may be unavailable (private mode, blocked) - app still works
+            }
+        }
+
+        function loadData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const data = JSON.parse(raw);
+                if (Array.isArray(data.dutyDates) && data.dutyDates.length > 0 &&
+                    Array.isArray(data.members) && data.members.length > 0) {
+                    dutyDates = data.dutyDates.map(String);
+                    members = data.members.map((m, i) => ({
+                        id: typeof m.id === 'number' ? m.id : i + 1,
+                        name: String(m.name || ''),
+                        available: Array.isArray(m.available) ? m.available.map(String) : []
+                    }));
+                }
+            } catch (e) {
+                // Corrupted data - fall back to defaults
+            }
+        }
+
+        function resetData() {
+            if (!confirm('ต้องการล้างรายชื่อและวันที่ทั้งหมด แล้วกลับไปใช้ค่าเริ่มต้นหรือไม่?')) return;
+            const d = getDefaults();
+            dutyDates = d.dutyDates;
+            members = d.members;
+            saveData();
+            document.getElementById('result-section').classList.add('hidden');
+            renderDates();
+            showToast("รีเซ็ตเรียบร้อยแล้ว", "🔄");
+        }
+
+        // Escape text for safe use inside HTML attributes / content
+        function esc(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // On Page Load
+        window.onload = function() {
+            loadData();
+            renderDates();
+        };
+
+        // ---- Dates ----
+        function renderDates() {
+            const container = document.getElementById('dates-container');
+            container.innerHTML = '';
+
+            dutyDates.forEach((dateVal, index) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-3 bg-slate-50/70 p-3 rounded-2xl border border-slate-200/80';
+                row.innerHTML = `
+                    <span class="text-xs font-semibold text-slate-400 w-6 text-center">#${index + 1}</span>
+                    <input type="text" value="${esc(dateVal)}" oninput="updateDateValue(${index}, this.value)" placeholder="เช่น วันที่ 1 - 3 หรือ วันที่ 12"
+                        class="flex-1 bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <button onclick="removeDate(${index})" class="p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors" title="ลบวันนี้">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                `;
+                container.appendChild(row);
+            });
+            // Refresh member checkboxes whenever the date list changes
+            renderMembers();
+        }
+
+        function addDateRow() {
+            dutyDates.push(`วันที่ ${dutyDates.length + 1}`);
+            saveData();
+            renderDates();
+        }
+
+        function updateDateValue(index, val) {
+            const oldVal = dutyDates[index];
+            dutyDates[index] = val;
+            // Keep members' availability in sync with the renamed date
+            members.forEach(m => {
+                const idx = m.available.indexOf(oldVal);
+                if (idx !== -1) {
+                    m.available[idx] = val;
+                }
+            });
+            saveData();
+        }
+
+        function removeDate(index) {
+            if (dutyDates.length <= 1) {
+                showToast("ต้องมีวันที่อย่างน้อย 1 วัน", "⚠️");
+                return;
+            }
+            const removed = dutyDates.splice(index, 1)[0];
+            members.forEach(m => {
+                m.available = m.available.filter(d => d !== removed);
+            });
+            saveData();
+            renderDates();
+        }
+
+        // ---- Members ----
+        function renderMembers() {
+            const container = document.getElementById('members-container');
+            container.innerHTML = '';
+
+            members.forEach((member, mIndex) => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80';
+
+                let checkboxesHtml = '';
+                dutyDates.forEach((date, dIndex) => {
+                    const isChecked = member.available.includes(date) ? 'checked' : '';
+                    checkboxesHtml += `
+                        <label class="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-medium cursor-pointer hover:border-emerald-300 transition-colors">
+                            <input type="checkbox" ${isChecked} onchange="toggleMemberDate(${mIndex}, ${dIndex}, this.checked)" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                            <span class="text-slate-700">${esc(date)}</span>
+                        </label>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                        <div class="flex items-center gap-3 flex-1">
+                            <span class="text-xs font-semibold text-slate-400 w-6">#${mIndex + 1}</span>
+                            <input type="text" value="${esc(member.name)}" oninput="updateMemberName(${mIndex}, this.value)" placeholder="ชื่อสมาชิก"
+                                class="flex-1 bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        </div>
+                        <button onclick="removeMember(${mIndex})" class="self-end sm:self-center p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors" title="ลบสมาชิก">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 mb-2 ml-9">วันที่สะดวกทำเวร:</p>
+                        <div class="flex flex-wrap gap-2 ml-0 sm:ml-9">
+                            ${checkboxesHtml || '<span class="text-xs text-rose-500">กรุณาเพิ่มวันที่ด้านบนก่อน</span>'}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function addMemberRow() {
+            const newId = members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 : 1;
+            members.push({
+                id: newId,
+                name: `สมาชิก ${newId}`,
+                available: [...dutyDates] // default: available on all dates
+            });
+            saveData();
+            renderMembers();
+        }
+
+        function updateMemberName(index, val) {
+            members[index].name = val;
+            saveData();
+        }
+
+        function toggleMemberDate(memberIndex, dateIndex, isChecked) {
+            const date = dutyDates[dateIndex];
+            const member = members[memberIndex];
+            if (isChecked) {
+                if (!member.available.includes(date)) {
+                    member.available.push(date);
+                }
+            } else {
+                member.available = member.available.filter(d => d !== date);
+            }
+            saveData();
+        }
+
+        function removeMember(index) {
+            if (members.length <= 1) {
+                showToast("ต้องมีสมาชิกอย่างน้อย 1 คน", "⚠️");
+                return;
+            }
+            members.splice(index, 1);
+            saveData();
+            renderMembers();
+        }
+
+        // ---- Randomization ----
+        function randomizeDuty() {
+            if (dutyDates.length === 0) {
+                showToast("กรุณากำหนดวันที่ต้องมีเวรอย่างน้อย 1 วัน", "❌");
+                return;
+            }
+            if (members.length === 0) {
+                showToast("กรุณาเพิ่มสมาชิกอย่างน้อย 1 คน", "❌");
+                return;
+            }
+
+            // Count by member id so two people with the same name are still counted separately
+            let assignedCounts = {};
+            members.forEach(m => assignedCounts[m.id] = 0);
+
+            let schedule = [];
+            let unassignedDays = [];
+
+            for (let date of dutyDates) {
+                let availableCandidates = members.filter(m => m.available.includes(date));
+
+                if (availableCandidates.length === 0) {
+                    unassignedDays.push(date);
+                } else {
+                    // Pick among those with the fewest duties so far (fairness)
+                    let minCount = Math.min(...availableCandidates.map(c => assignedCounts[c.id]));
+                    let fairestCandidates = availableCandidates.filter(c => assignedCounts[c.id] === minCount);
+
+                    let chosen = fairestCandidates[Math.floor(Math.random() * fairestCandidates.length)];
+                    schedule.push({ date: date, person: chosen.name || '(ไม่ได้ใส่ชื่อ)' });
+                    assignedCounts[chosen.id]++;
+                }
+            }
+
+            if (unassignedDays.length > 0) {
+                showToast(`ไม่สามารถจัดเวรได้: ไม่มีใครสะดวกทำใน ${unassignedDays.join(', ')}`, "❌");
+                document.getElementById('result-section').classList.add('hidden');
+            } else {
+                displayResults(schedule);
+                showToast("สุ่มเวรสำเร็จเรียบร้อย!", "🎉");
+            }
+        }
+
+        function displayResults(schedule) {
+            const tbody = document.getElementById('result-tbody');
+            tbody.innerHTML = '';
+
+            schedule.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/50 transition-colors';
+                tr.innerHTML = `
+                    <td class="py-3.5 px-4 font-medium text-slate-800 border-b border-slate-100">${esc(item.date)}</td>
+                    <td class="py-3.5 px-4 text-emerald-700 font-semibold border-b border-slate-100">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>${esc(item.person)}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const resultSection = document.getElementById('result-section');
+            resultSection.classList.remove('hidden');
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ---- Copy results ----
+        function copyResults() {
+            const rows = document.querySelectorAll('#result-tbody tr');
+            if (rows.length === 0) return;
+
+            let text = "📋 ตารางเวรทิ้งขยะประจำรอบนี้:\n";
+            rows.forEach(row => {
+                const cols = row.querySelectorAll('td');
+                if (cols.length >= 2) {
+                    text += `• ${cols[0].innerText.trim()}: ${cols[1].innerText.trim()}\n`;
+                }
+            });
+
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            showToast("คัดลอกตารางเวรเรียบร้อยแล้ว!", "📋");
+        }
+
+        // ---- Toast ----
+        function showToast(message, icon = "✅") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = message;
+            document.getElementById('toast-icon').innerText = icon;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
